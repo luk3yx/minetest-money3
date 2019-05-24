@@ -23,7 +23,10 @@ local income = {}
 
 -- Earn income
 function money3.earn_income(name)
-	if type(name) ~= "string" then name = name:get_player_name() end
+	if type(name) ~= "string" then
+		if name.is_fake_player then return end
+		name = name:get_player_name()
+	end
 	if income[name] then
 		income[name] = nil
 		money3.add(name, 10)
