@@ -85,11 +85,12 @@ function money3.add(name, amount)
 		return "The amount specified must be a positive non-NaN number."
 	end
 
-	if not money3.user_exists(name) then
+	local credit = money3.get(name)
+	if not credit then
 		return name .. " does not exist."
 	end
 
-	money3.set(name, money3.get(name) + amount)
+	money3.set(name, credit + amount)
 	return nil
 end
 
