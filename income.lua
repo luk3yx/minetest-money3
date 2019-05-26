@@ -24,7 +24,7 @@ local income = {}
 -- Earn income
 function money3.earn_income(name)
 	if type(name) ~= "string" then
-		if name.is_fake_player then return end
+		if not name or name.is_fake_player then return end
 		name = name:get_player_name()
 	end
 	if income[name] then
