@@ -29,10 +29,11 @@ function money3.earn_income(name)
 	end
 	if income[name] then
 		income[name] = nil
-		money3.add(name, 10)
+		local amount = money3.income_amount
+		money3.add(name, amount)
 
 		-- Tell the player
-		local msg = "[money3] You have earned " .. money3.format(10) ..
+		local msg = "[money3] You have earned " .. money3.format(amount) ..
 			". Your balance is now " .. money3.format(money3.get(name)) .. "."
 
 		if minetest.colorize then msg = minetest.colorize("#CCCCCC", msg) end

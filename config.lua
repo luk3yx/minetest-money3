@@ -58,6 +58,7 @@ end
 
 setting("initial_amount", 0)
 setting("currency_name", "cr")
+setting("income_amount", 10)
 
 setting("convert_items", {
 	gold = { item = "default:gold_ingot", dig_block="default:stone_with_gold", desc='Gold', amount=75, minval=25 },

@@ -12,12 +12,14 @@ again).
  - `money3.initial_amount`: The amount of money new players get. Default: `0`.
  - `money3.currency_name`: The text appended to the currency when displaying it.
     Default: `cr`.
- - `money3.enable_income`: Pays players 10cr every in-game day.
-    Default: `true` if creative mode is disabled, otherwise `false`. If you are
-    using the  [currency](https://gitlab.com/VanessaE/currency) mod, it is
-    probably a good idea to set `currency.income_enabled` to `false`. If you
+ - `money3.enable_income`: Pays players money (by default 10cr) every in-game
+    day. Default: `true` if creative mode is disabled, otherwise `false`. If
+    you are using the  [currency](https://gitlab.com/VanessaE/currency) mod, it
+    is probably a good idea to set `currency.income_enabled` to `false`. If you
     use an outdated version of the currency mod where this setting does not
     exist, the automatic income system is automatically disabled.
+ - `money3.income_amount`: Changes the amount of income players get paid. If
+    income is not enabled, this does nothing.
  - `money3.convert_items`: A lua table (that can also be `nil` to disable)
     similar to the following (default) one:
 

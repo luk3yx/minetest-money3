@@ -11,3 +11,7 @@ money3.convert_items (A lua table with a list of money3 items) string
 #   Automatically give active players 10cr every 12 minutes. If the currency
 #   mod is installed and this is enabled, its income will be disabled.
 money3.enable_income (Enable money3 income) bool true
+
+#   Changes the amount of income players get paid. If income is not enabled,
+#   this does nothing.
+money3.income_amount (Amount to pay players in money3 income) int 10 0
