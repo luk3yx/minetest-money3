@@ -21,17 +21,10 @@
 --
 
 local function setting(name, default)
-	name = name
-	local value
-	if minetest.settings then
-		value = minetest.settings:get("money3." .. name)
-	else
-		setting = minetest.setting_get("money3." .. name)
-	end
-
+	local value = minetest.settings:get("money3." .. name)
 	if value and type(default) == "number" then
 		value = tonumber(value)
-		if value ~= value then value = false end
+		if value ~= value then value = nil end
 	end
 
 	if value and value ~= "" then
@@ -42,13 +35,7 @@ local function setting(name, default)
 end
 
 local function setting_bool(name, default)
-	local value
-	if minetest.settings then
-		value = minetest.settings:get_bool("money3" .. name)
-	else
-		value = minetest.setting_getbool("money3" .. name)
-	end
-
+	local value = minetest.settings:get_bool("money3." .. name)
 	if value == nil then
 		money3[name] = default
 	else
