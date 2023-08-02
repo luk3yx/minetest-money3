@@ -46,14 +46,18 @@ local function migrate_old_balance(name, do_not_set)
 	os.remove(path)
 
 	if not do_not_set and credit and credit == credit and credit >= 0 then
-		return money3.set(name, (raw_get_balance(name) or 0) + credit)
+		money3.set(name, credit)
+		return credit
 	end
 end
 
 -- Combine the two above functions to provide seamless backwards compatibility
 function money3.get(name)
-	migrate_old_balance(name)
-	return raw_get_balance(name)
+	local balance = raw_get_balance(name)
+	if balance == nil then
+		balance = migrate_old_balance(name)
+	end
+	return balance
 end
 
 -- Round a balance
@@ -63,9 +67,12 @@ end
 
 -- Set a balance
 function money3.set(name, balance)
-	migrate_old_balance(name, true)
+	local key = "balance-" .. name:lower()
+	if storage:get_string(key) == "" then
+		migrate_old_balance(name, true)
+	end
 	balance = money3.round(balance)
-	storage:set_string("balance-" .. name:lower(), tostring(balance))
+	storage:set_string(key, tostring(balance))
 end
 
 -- Check if a user exists
