@@ -79,14 +79,7 @@ if minetest.get_modpath("um_core") then
 			money3.set(name, default_balance or 0)
 			return true
 		end,
-		delete_account = function(name)
-			-- Deleting the accounts of online players will cause bugs
-			if minetest.get_player_by_name(name) then
-				return false
-			end
-			storage:set_string("balance-" .. name:lower(), "")
-			return true
-		end,
+		delete_account = money3.delete,
 		account_exists = money3.user_exists,
 		list_accounts = function()
 			local get_canonical_name = make_canonical_name_cache()

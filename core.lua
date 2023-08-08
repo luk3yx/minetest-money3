@@ -51,6 +51,19 @@ function money3.user_exists(name)
 end
 money3.has_credit = money3.user_exists
 
+-- Delete data associated with account
+function money3.delete(name)
+	local lname = name:lower()
+	for _, player in ipairs(minetest.get_connected_players()) do
+		if player:get_player_name():lower() == lname then
+			-- Deleting the accounts of online players will cause bugs
+			return false
+		end
+	end
+	storage:set_string("balance-" .. lname, "")
+	return true
+end
+
 -- Add money
 function money3.add(name, amount)
 	if amount ~= amount or amount < 0 then
