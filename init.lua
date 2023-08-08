@@ -71,7 +71,7 @@ if minetest.get_modpath("um_core") then
 		get_balance = money3.get,
 		set_balance = set_if_exists,
 		create_account = function(name, default_balance)
-			if name:find("^[A-Za-z0-9_%-]+$") and
+			if not name:find(":", 1, true) and
 					not minetest.get_player_privs(name).money then
 				return false
 			end
