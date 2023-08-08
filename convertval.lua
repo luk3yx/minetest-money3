@@ -21,15 +21,14 @@
 --
 
 local storage = assert(...)
-local stat_file = minetest.get_worldpath() .. "/convert_stats"
 
 minetest.register_chatcommand("convertval", {
 	privs = {money = true},
 	params = "",
 	description = "Shows the current value of convertable items",
-	func = function(name, param)
+	func = function(name)
 		minetest.chat_send_player(name, "Convertable item values:")
-		for k, v in pairs(money3.stats) do
+		for k in pairs(money3.stats) do
 			minetest.chat_send_player(name, money3.convert_items[k].desc ..
 				": "..money3.format(money3.stats[k].running_value) .. " each.")
 		end
@@ -37,8 +36,8 @@ minetest.register_chatcommand("convertval", {
 	end
 })
 
-function money3.dignode(pos, node, player)
-	for k,v in pairs(money3.convert_items) do
+function money3.dignode(_, node)
+	for k in pairs(money3.convert_items) do
 		if ( node.name == money3.convert_items[k].dig_block ) then
 			money3.stats[k].running_dug = money3.stats[k].running_dug + 1
 		end
@@ -46,7 +45,7 @@ function money3.dignode(pos, node, player)
 end
 
 function money3.calcConvertValues()
-    core.log('warn',
+    minetest.log('warn',
         '[money3] Another mod tried to access money3.calcConvertValues.')
 end
 
@@ -73,29 +72,12 @@ end
 
 function money3.save_stats()
 	minetest.log("verbose", "Saving convert stats")
-	local f = io.open(stat_file, "w")
-	f:write(minetest.serialize(money3.stats))
-	f:close()
-end
-
-local function load_old_stats()
-    local f = io.open(stat_file, "r")
-    if not f then return false end
-        minetest.log("verbose", "[money3] Migrating legacy stats file.")
-    local t = f:read("*all")
-    f:close()
-    os.remove(stat_file)
-
-    if not t or t == "" then return false end
-    storage:set_string("stats2", t)
-    return minetest.deserialize(t)
+	storage:set_string("stats2", minetest.serialize(money3.stats))
 end
 
 function money3.load_stats()
     minetest.log("verbose", "[money3] Loading convert stats.")
-	local t = storage:get_string("stats2")
-    if not t or t == "" then return load_old_stats() end
-    return minetest.deserialize(t)
+	return minetest.deserialize(storage:get_string("stats2"))
 end
 
 money3.stats = money3.load_stats()
@@ -103,7 +85,7 @@ money3.stats = money3.load_stats()
 if not money3.stats then
 	money3.stats = {}
 
-	for key, val in pairs(money3.convert_items) do
+	for key in pairs(money3.convert_items) do
 		minetest.log("action", "[money3] Initial Convert Stats Setup for " ..
 			money3.convert_items[key].desc)
 		money3.stats[key] = {
@@ -120,7 +102,7 @@ minetest.register_on_dignode(money3.dignode)
 minetest.after(5, calcConvertValues)
 
 local convert_options = {}
-for k,v in pairs(money3.convert_items) do
+for k in pairs(money3.convert_items) do
 	table.insert(convert_options, k)
 end
 
@@ -160,5 +142,3 @@ minetest.register_chatcommand("convert", {
 			param .. " into "..tostring(totalAmount)..money3.currency_name
 	end
 })
-
-convert_options = nil

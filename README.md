@@ -5,6 +5,16 @@ modern APIs such as mod storage and is fully backwards compatible with
 `money2` (you can upgrade from money2 nicely, however you can't downgrade
 again).
 
+## Before installing
+
+By default, players can convert gold and silver ingots into money using
+`/convert gold` and `/convert silver`. To disable this, add
+`money3.convert_items = nil` to minetest.conf.
+
+Players need the "money" privilege to be able to use /money and receive
+payments. You should consider adding `money` to the default_privs setting in
+minetest.conf.
+
 ## Config settings
 
 *These can be set in `config.lua` or `minetest.conf`.*
@@ -15,9 +25,7 @@ again).
  - `money3.enable_income`: Pays players money (by default 10cr) every in-game
     day. Default: `true` if creative mode is disabled, otherwise `false`. If
     you are using the  [currency](https://gitlab.com/VanessaE/currency) mod, it
-    is probably a good idea to set `currency.income_enabled` to `false`. If you
-    use an outdated version of the currency mod where this setting does not
-    exist, the automatic income system is automatically disabled.
+    is probably a good idea to set `currency.income_enabled` to `false`.
  - `money3.income_amount`: Changes the amount of income players get paid. If
     income is not enabled, this does nothing.
  - `money3.convert_items`: A lua table (that can also be `nil` to disable)

@@ -51,7 +51,7 @@ minetest.register_globalstep(function(dtime)
 	if time >= 720 then
 		-- Reset everything
 		time = 0
-		for k, v in pairs(income) do income[k] = nil end
+		for k in pairs(income) do income[k] = nil end
 
 		-- Add money
 		for _, player in ipairs(minetest.get_connected_players()) do
@@ -62,21 +62,10 @@ end)
 
 function money3.debug_step() time = 710 end
 
-minetest.register_on_dignode(function(pos, oldnode, digger)
+minetest.register_on_dignode(function(_, _, digger)
 	money3.earn_income(digger)
 end)
 
-minetest.register_on_placenode(function(pos, newnode, placer)
+minetest.register_on_placenode(function(_, _, placer)
 	money3.earn_income(placer)
 end)
-
--- If an outdated version of the currency mod exists, use a hack to disable its
---	income system.
-if minetest.get_modpath("currency") and
-		minetest.global_exists("players_income") and
-		not minetest.get_modpath("players_income") then
-	setmetatable(players_income, {
-		__index = function(table, key) return 0 end,
-		__newindex = function(table, key, value) end,
-	})
-end

@@ -31,6 +31,7 @@ assert(not minetest.get_modpath("money2"), "money3 and money2 do not mix.")
 
 local storage = minetest.get_mod_storage()
 loadfile(modpath .. "/core.lua")(storage)
+loadfile(modpath .. "/migration.lua")(storage)
 
 -- Only load convertval.lua if required.
 if next(money3.convert_items) then
@@ -42,18 +43,67 @@ if money3.enable_income then
 	dofile(modpath .. "/income.lua")
 end
 
+local function set_if_exists(name, balance)
+	if money3.user_exists(name) and balance == balance then
+		money3.set(name, balance)
+		return true
+	end
+	return false
+end
+
+-- Register money3 as a backend for unified_money
+if minetest.get_modpath("um_core") then
+	local function make_canonical_name_cache()
+		if minetest.global_exists("canonical_name") then
+			return canonical_name.get
+		end
+
+		local names = {}
+		for name in minetest.get_auth_handler().iterate() do
+			names[name:lower()] = name
+		end
+		return function(name)
+			return names[name:lower()]
+		end
+	end
+
+	unified_money.register_backend({
+		get_balance = money3.get,
+		set_balance = set_if_exists,
+		create_account = function(name, default_balance)
+			if name:find("^[A-Za-z0-9_%-]+$") and
+					not minetest.get_player_privs(name).money then
+				return false
+			end
+
+			money3.set(name, default_balance or 0)
+			return true
+		end,
+		delete_account = function(name)
+			storage:set_string("balance-" .. name:lower(), "")
+			return true
+		end,
+		account_exists = money3.user_exists,
+		list_accounts = function()
+			local get_canonical_name = make_canonical_name_cache()
+			local accounts = {}
+			for _, key in ipairs(storage:get_keys()) do
+				if key:sub(1, 8) == "balance-" then
+					local name = key:sub(9)
+					accounts[#accounts + 1] = get_canonical_name(name) or name
+				end
+			end
+			return accounts
+		end,
+	})
+end
+
 -- Make sure the lurkcoin mod knows that money3 exists
 if minetest.get_modpath("lurkcoin") then
 	lurkcoin.change_bank({
 		user_exists = money3.user_exists,
 		getbal = money3.get,
-		setbal = function(name, ...)
-			if money3.user_exists(name) then
-				money3.set(name, ...)
-				return true
-			end
-			return false
-		end,
+		setbal = set_if_exists,
 		pay = function(from, to, amount)
 			local err = money.transfer(from, to, amount)
 			return not err, err

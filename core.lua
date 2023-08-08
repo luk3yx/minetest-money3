@@ -21,43 +21,11 @@
 --
 
 local storage = assert(...)
-local worldpath = minetest.get_worldpath()
 
--- Raw get balance
-local function raw_get_balance(name)
+function money3.get(name)
 	local bal = tonumber(storage:get_string("balance-" .. name:lower()))
 	if not bal or bal ~= bal then return nil end
 	return bal
-end
-
--- Migrate an old balance
-local function migrate_old_balance(name, do_not_set)
-	-- Make sure the name doesn't contain any insane characters
-	if not name:find("^[A-Za-z0-9_%-]+$") then return end
-
-	-- Try and get a handler to the balance file
-	local path = worldpath .. "/money_" .. name .. ".txt"
-	local file = io.open(path, "r")
-	if not file then return end
-
-	-- Read the credit and nuke the file.
-	local credit = file:read("*n")
-	file:close()
-	os.remove(path)
-
-	if not do_not_set and credit and credit == credit and credit >= 0 then
-		money3.set(name, credit)
-		return credit
-	end
-end
-
--- Combine the two above functions to provide seamless backwards compatibility
-function money3.get(name)
-	local balance = raw_get_balance(name)
-	if balance == nil then
-		balance = migrate_old_balance(name)
-	end
-	return balance
 end
 
 -- Round a balance
@@ -67,22 +35,19 @@ end
 
 -- Set a balance
 function money3.set(name, balance)
-	local key = "balance-" .. name:lower()
-	if storage:get_string(key) == "" then
-		migrate_old_balance(name, true)
-	end
 	balance = money3.round(balance)
-	storage:set_string(key, tostring(balance))
+	storage:set_string("balance-" .. name:lower(), tostring(balance))
 end
 
 -- Check if a user exists
 function money3.user_exists(name)
-	local privs = minetest.get_player_privs(name)
-	if not privs or not privs.money or not money3.get(name) then
+	-- Allow non-player accounts to exist (provided they contain a colon in
+	-- their name)
+	if not name:find(":", 1, true) and
+			not minetest.get_player_privs(name).money then
 		return false
 	end
-
-	return true
+	return money3.get(name) ~= nil
 end
 money3.has_credit = money3.user_exists
 
@@ -130,7 +95,7 @@ function money3.transfer(from, to, amount)
 	local err = money3.dec(from, amount)
 	if err then return err end
 
-	local err = money3.add(to, amount)
+	err = money3.add(to, amount)
 	if err then
 		money3.add(from, amount)
 		return err
@@ -145,7 +110,7 @@ function money3.format(amount)
 	return tostring(amount) .. (money3.currency_name or "cr")
 end
 
--- Migrate balances and set the initial amount.
+-- Set the initial balance
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	if not money3.get(name) then
@@ -164,7 +129,7 @@ minetest.register_chatcommand("money", {
 	privs = {money=true},
 	params = "[<player> | pay/set/add/dec <player> <amount>]",
 	description = "Operations with credit",
-	func = function(name,  param)
+	func = function(name, param)
 		if param == "" then
 			return true, "Your balance: " .. money3.format(money3.get(name))
 		end
@@ -221,4 +186,4 @@ minetest.register_chatcommand("money", {
 })
 
 -- A dummy money3.dignode() function. This is modified in convertval.lua.
-function money3.dignode(pos, node, player) end
+function money3.dignode() end
