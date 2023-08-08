@@ -80,6 +80,10 @@ if minetest.get_modpath("um_core") then
 			return true
 		end,
 		delete_account = function(name)
+			-- Deleting the accounts of online players will cause bugs
+			if minetest.get_player_by_name(name) then
+				return false
+			end
 			storage:set_string("balance-" .. name:lower(), "")
 			return true
 		end,
