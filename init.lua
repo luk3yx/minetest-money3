@@ -52,7 +52,8 @@ local function set_if_exists(name, balance)
 end
 
 -- Register money3 as a backend for unified_money
-if minetest.get_modpath("um_core") then
+if minetest.get_modpath("um_core") and
+		minetest.get_modpath("um_plugin_playername") then
 	local function make_canonical_name_cache()
 		if minetest.global_exists("canonical_name") then
 			return canonical_name.get
