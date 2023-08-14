@@ -64,7 +64,7 @@ if minetest.get_modpath("um_core") and
 			names[name:lower()] = name
 		end
 		return function(name)
-			return names[name:lower()]
+			return names[name]
 		end
 	end
 
@@ -92,6 +92,17 @@ if minetest.get_modpath("um_core") and
 				end
 			end
 			return accounts
+		end,
+		canonical_name = function(name)
+			-- Non-player accounts are stored with lowercase names
+			if name:find(":", 1, true) then
+				return name:lower()
+			end
+
+			-- While player accounts are stored with lowercase names as well,
+			-- the check for the "money" privilege makes them effectively case
+			-- sensitive.
+			return name
 		end,
 	})
 end
