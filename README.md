@@ -24,8 +24,8 @@ minetest.conf.
     Default: `cr`.
  - `money3.enable_income`: Pays players money (by default 10cr) every in-game
     day. Default: `true` if creative mode is disabled, otherwise `false`. If
-    you are using the  [currency](https://gitlab.com/VanessaE/currency) mod, it
-    is probably a good idea to set `currency.income_enabled` to `false`.
+    you are using the [currency](https://content.minetest.net/packages/mt-mods/currency/)
+    mod, it is probably a good idea to set `currency.income_enabled` to `false`.
  - `money3.income_amount`: Changes the amount of income players get paid. If
     income is not enabled, this does nothing.
  - `money3.convert_items`: A lua table (that can also be `nil` to disable)
