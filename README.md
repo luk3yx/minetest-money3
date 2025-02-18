@@ -40,3 +40,11 @@ minetest.conf.
         minval=7}
 }
 ```
+
+## unified_money backend
+
+If [unified_money](https://content.luanti.org/packages/Emojiminetest/unified_money/)
+(more specifically `um_plugin_playername`) is installed, money3 will register
+itself as a unified_money backend. This means that any mods using the
+unified_money frontend API will be able to work with money3 without any
+additional effort.
